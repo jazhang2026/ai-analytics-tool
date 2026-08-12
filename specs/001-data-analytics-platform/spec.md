@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Build a multi-tenant application that can run data analytic tasks. 1. Register tenant with tenant admin. 2. Tenant admin create tenant user and assign user role: admin, user. 3. Admin and user login, change password. Minimum password request: 8-12 chars include upcase, lowercase, number. 4. User send request from a browser UI. 5. Application run data analytic. Data sources: text file, pdf, word, excel. 6. Find good data analytic method. 7. Show result on UI and also can be downloaded. 8. Not using external database for application data storage. instead use embedded database or file system. 9. Add operator role to manage tenant and data backup and restore. 10. Operator can view all tenant data and manage them. 11. Operator backup and restore data application database."
+**Input**: User description: "Build a multi-tenant application that can run data analytic tasks. 1. Register tenant with tenant admin. 2. Tenant admin create tenant user and assign user role: admin, user. 3. Admin and user login, change password. Minimum password request: 8-12 chars include upcase, lowercase, number. 4. User send request from a browser UI. 5. Application run data analytic. Data sources: text file, pdf, word, excel. 6. Find good data analytic method. 7. Show result on UI and also can be downloaded. 8. Not using external database for application data storage. instead use embedded database or file system. 9. Add operator role to manage tenant and data backup and restore. 10. Operator can view all tenant data and manage them. 11. Operator backup and restore data application database. 12. On the data model, define the needed index and unique index to help the performance."
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -194,6 +194,7 @@ The operator can back up the application database to a file and restore the data
 - **FR-020**: System MUST allow the operator to perform database backup to a file
 - **FR-021**: System MUST allow the operator to restore the application database from a backup file
 - **FR-022**: System MUST maintain audit logs of operator actions including backup and restore events
+- **FR-023**: System MUST define unique indexes for data integrity constraints and performance indexes for common query patterns across all entities in the data model
 
 ### Key Entities
 
@@ -223,6 +224,7 @@ The operator can back up the application database to a file and restore the data
 - **SC-010**: An operator can view and navigate any tenant workspace within 5 seconds of selection
 - **SC-011**: A database backup operation completes within 30 seconds for typical application data sizes
 - **SC-012**: A database restore operation completes within 60 seconds and leaves the system in a consistent state
+- **SC-013**: Common tenant-scoped queries (user listing, request listing, data source listing) return results within 200ms for up to 10,000 records
 
 ## Assumptions
 
