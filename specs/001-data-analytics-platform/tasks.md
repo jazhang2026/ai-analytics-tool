@@ -25,12 +25,12 @@
 
 **Independent Test**: The app can start locally, initialize the embedded database, and load the base frontend/backend shells without tenant-specific features
 
-- [ ] T005 Implement embedded database (SQLite) connection, settings loading, and shared persistence bootstrap in `backend/app/storage.py`
-- [ ] T006 [P] Implement tenant-scoped authentication, session handling, role checks, and password policy helpers in `backend/app/auth.py`
-- [ ] T007 [P] Define the core tenant-scoped data models for Tenant, User, Operator, TenantMembership, DataSource, AnalyticsRequest, AnalyticsResult, BackupRecord, and AuditLog in `backend/app/models.py`
-- [ ] T008 [P] Create unique and performance indexes on all entity tables as defined in the data model (tenant name, tenant-scoped email, membership, request-to-result, audit entity lookups, etc.) in `backend/app/models.py`
-- [ ] T009 Implement FastAPI app bootstrap, error handling, dependency wiring, and route registration in `backend/app/main.py`
-- [ ] T010 [P] Build the frontend app shell, shared API client, navigation state, and common layout in `frontend/src/main.js`, `frontend/src/api.js`, `frontend/src/ui.js`, and `frontend/src/styles.css`
+- [x] T005 Implement embedded database (SQLite) connection, settings loading, and shared persistence bootstrap in `backend/app/storage.py`
+- [x] T006 [P] Implement tenant-scoped authentication, session handling, role checks, and password policy helpers in `backend/app/auth.py`
+- [x] T007 [P] Define the core tenant-scoped data models for Tenant, User, Operator, TenantMembership, DataSource, AnalyticsRequest, AnalyticsResult, BackupRecord, and AuditLog in `backend/app/models.py`
+- [x] T008 [P] Create unique and performance indexes on all entity tables as defined in the data model (tenant name, tenant-scoped email, membership, request-to-result, audit entity lookups, etc.) in `backend/app/models.py`
+- [x] T009 Implement FastAPI app bootstrap, error handling, dependency wiring, and route registration in `backend/app/main.py`
+- [x] T010 [P] Build the frontend app shell, shared API client, navigation state, and common layout in `frontend/src/main.js`, `frontend/src/api.js`, `frontend/src/ui.js`, and `frontend/src/styles.css`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -42,9 +42,9 @@
 
 **Independent Test**: Create a tenant through the browser UI and verify the tenant exists with one active admin account
 
-- [ ] T011 [US1] Implement tenant registration service and `POST /api/tenants` endpoint in `backend/app/tenants.py`
-- [ ] T012 [P] [US1] Build the tenant registration form, validation, and submission flow in `frontend/src/ui.js`, `frontend/src/api.js`, and `frontend/src/styles.css`
-- [ ] T013 [US1] Wire tenant registration to session handoff and dashboard redirect in `frontend/src/main.js`
+- [x] T011 [US1] Implement tenant registration service and `POST /api/tenants` endpoint in `backend/app/tenants.py`
+- [x] T012 [P] [US1] Build the tenant registration form, validation, and submission flow in `frontend/src/ui.js`, `frontend/src/api.js`, and `frontend/src/styles.css`
+- [x] T013 [US1] Wire tenant registration to session handoff and dashboard redirect in `frontend/src/main.js`
 
 **Checkpoint**: Tenant registration should be fully functional and tenant-scoped
 
@@ -56,10 +56,10 @@
 
 **Independent Test**: Create a tenant user from the admin UI and confirm the user is listed in the tenant with the selected role
 
-- [ ] T014 [US2] Implement tenant user creation and tenant user listing endpoints in `backend/app/tenants.py`
-- [ ] T015 [US2] Implement tenant role update handling using body-based `user_id` in `backend/app/tenants.py`
-- [ ] T016 [P] [US2] Build the tenant admin user management screen in `frontend/src/ui.js` and `frontend/src/api.js`
-- [ ] T017 [US2] Enforce tenant-admin authorization and tenant membership checks in `backend/app/auth.py` and `backend/app/main.py`
+- [x] T014 [US2] Implement tenant user creation and tenant user listing endpoints in `backend/app/tenants.py`
+- [x] T015 [US2] Implement tenant role update handling using body-based `user_id` in `backend/app/tenants.py`
+- [x] T016 [P] [US2] Build the tenant admin user management screen in `frontend/src/ui.js` and `frontend/src/api.js`
+- [x] T017 [US2] Enforce tenant-admin authorization and tenant membership checks in `backend/app/auth.py` and `backend/app/main.py`
 
 **Checkpoint**: Tenant admins should be able to manage tenant users without affecting other tenants
 
@@ -71,10 +71,10 @@
 
 **Independent Test**: Log in with valid credentials, change the password, and confirm the new password works while the old password no longer does
 
-- [ ] T018 [US3] Implement tenant-scoped login, logout, and `PATCH /api/me/password` in `backend/app/auth.py`
-- [ ] T019 [US3] Enforce the 8-12 character password policy with uppercase, lowercase, and numeric requirements in `backend/app/auth.py`
-- [ ] T020 [P] [US3] Build login and password change screens with password-policy guidance in `frontend/src/ui.js`, `frontend/src/api.js`, and `frontend/src/styles.css`
-- [ ] T021 [US3] Add authentication state persistence and route guarding in `frontend/src/main.js`
+- [x] T018 [US3] Implement tenant-scoped login, logout, and `PATCH /api/me/password` in `backend/app/auth.py`
+- [x] T019 [US3] Enforce the 8-12 character password policy with uppercase, lowercase, and numeric requirements in `backend/app/auth.py`
+- [x] T020 [P] [US3] Build login and password change screens with password-policy guidance in `frontend/src/ui.js`, `frontend/src/api.js`, and `frontend/src/styles.css`
+- [x] T021 [US3] Add authentication state persistence and route guarding in `frontend/src/main.js`
 
 **Checkpoint**: Tenant members should be able to sign in and update passwords securely
 
@@ -86,10 +86,10 @@
 
 **Independent Test**: Submit a request through the browser and verify the system accepts it and tracks it for the current tenant
 
-- [ ] T022 [US4] Implement analytics request creation and tenant-scoped request listing in `backend/app/analytics.py`
-- [ ] T023 [US4] Implement request detail lookup using body-based `request_id` in `backend/app/analytics.py`
-- [ ] T024 [P] [US4] Build the analytics request submission form and request list/detail navigation in `frontend/src/ui.js` and `frontend/src/api.js`
-- [ ] T025 [US4] Connect request submission flow to tenant-scoped dashboard actions in `frontend/src/main.js`
+- [x] T022 [US4] Implement analytics request creation and tenant-scoped request listing in `backend/app/analytics.py`
+- [x] T023 [US4] Implement request detail lookup using body-based `request_id` in `backend/app/analytics.py`
+- [x] T024 [P] [US4] Build the analytics request submission form and request list/detail navigation in `frontend/src/ui.js` and `frontend/src/api.js`
+- [x] T025 [US4] Connect request submission flow to tenant-scoped dashboard actions in `frontend/src/main.js`
 
 **Checkpoint**: Tenant users should be able to submit and track analytics requests
 
@@ -101,10 +101,10 @@
 
 **Independent Test**: Upload supported file types and confirm they are accepted and available only within the tenant workspace
 
-- [ ] T026 [US5] Implement file upload persistence, file format validation, and source registration in `backend/app/storage.py`
-- [ ] T027 [US5] Add tenant-source checks so analytics can only use files from the same tenant in `backend/app/analytics.py`
-- [ ] T028 [P] [US5] Build the file upload screen, supported-format feedback, and source management in `frontend/src/ui.js`, `frontend/src/api.js`, and `frontend/src/styles.css`
-- [ ] T029 [US5] Add source status display and tenant-aware file navigation in `frontend/src/main.js`
+- [x] T026 [US5] Implement file upload persistence, file format validation, and source registration in `backend/app/storage.py`
+- [x] T027 [US5] Add tenant-source checks so analytics can only use files from the same tenant in `backend/app/analytics.py`
+- [x] T028 [P] [US5] Build the file upload screen, supported-format feedback, and source management in `frontend/src/ui.js`, `frontend/src/api.js`, and `frontend/src/styles.css`
+- [x] T029 [US5] Add source status display and tenant-aware file navigation in `frontend/src/main.js`
 
 **Checkpoint**: Tenant-uploaded files should be usable for analytics and isolated from other tenants
 
@@ -116,10 +116,10 @@
 
 **Independent Test**: Submit different file-based request types and verify the selected method and explanation match the request type
 
-- [ ] T030 [US6] Implement the analytics method router, file-type detection, and fallback selection logic in `backend/app/analytics.py`
-- [ ] T031 [US6] Implement method rationale and confidence/explanation payload generation in `backend/app/analytics.py`
-- [ ] T032 [P] [US6] Add method summary and rationale sections to the request detail UI in `frontend/src/ui.js` and `frontend/src/api.js`
-- [ ] T033 [US6] Surface the selected analytics method and explanation in dashboard and request views in `frontend/src/main.js`
+- [x] T030 [US6] Implement the analytics method router, file-type detection, and fallback selection logic in `backend/app/analytics.py`
+- [x] T031 [US6] Implement method rationale and confidence/explanation payload generation in `backend/app/analytics.py`
+- [x] T032 [P] [US6] Add method summary and rationale sections to the request detail UI in `frontend/src/ui.js` and `frontend/src/api.js`
+- [x] T033 [US6] Surface the selected analytics method and explanation in dashboard and request views in `frontend/src/main.js`
 
 **Checkpoint**: Analytics requests should have an explainable method choice
 
@@ -131,10 +131,10 @@
 
 **Independent Test**: Complete a request, open the result view, and download the generated output file successfully
 
-- [ ] T034 [US7] Implement result persistence, retrieval, and body-based `request_id` lookup in `backend/app/analytics.py`
-- [ ] T035 [US7] Implement CSV, PDF, and Excel export generation in `backend/app/analytics.py`
-- [ ] T036 [P] [US7] Build the result review page and download actions in `frontend/src/ui.js` and `frontend/src/api.js`
-- [ ] T037 [US7] Add result rendering, file-download states, and status refresh behavior in `frontend/src/main.js` and `frontend/src/styles.css`
+- [x] T034 [US7] Implement result persistence, retrieval, and body-based `request_id` lookup in `backend/app/analytics.py`
+- [x] T035 [US7] Implement CSV, PDF, and Excel export generation in `backend/app/analytics.py`
+- [x] T036 [P] [US7] Build the result review page and download actions in `frontend/src/ui.js` and `frontend/src/api.js`
+- [x] T037 [US7] Add result rendering, file-download states, and status refresh behavior in `frontend/src/main.js` and `frontend/src/styles.css`
 
 **Checkpoint**: Analytics results should be visible and downloadable from the UI
 
@@ -146,11 +146,11 @@
 
 **Independent Test**: Log in as operator, view the tenant list, and access a specific tenant's users and requests
 
-- [ ] T038 [US8] Implement operator authentication, session handling, and role enforcement in `backend/app/auth.py`
-- [ ] T039 [US8] Implement cross-tenant data access endpoints for operator in `backend/app/operators.py`
-- [ ] T040 [US8] Implement tenant listing, tenant detail, and tenant-scoped data browsing for operators in `backend/app/operators.py`
-- [ ] T041 [P] [US8] Build the operator dashboard, tenant list view, and tenant navigation in `frontend/src/ui.js`, `frontend/src/api.js`, and `frontend/src/styles.css`
-- [ ] T042 [US8] Add operator authentication state and role-based route guarding in `frontend/src/main.js`
+- [x] T038 [US8] Implement operator authentication, session handling, and role enforcement in `backend/app/auth.py`
+- [x] T039 [US8] Implement cross-tenant data access endpoints for operator in `backend/app/operators.py`
+- [x] T040 [US8] Implement tenant listing, tenant detail, and tenant-scoped data browsing for operators in `backend/app/operators.py`
+- [x] T041 [P] [US8] Build the operator dashboard, tenant list view, and tenant navigation in `frontend/src/ui.js`, `frontend/src/api.js`, and `frontend/src/styles.css`
+- [x] T042 [US8] Add operator authentication state and role-based route guarding in `frontend/src/main.js`
 
 **Checkpoint**: Operators should be able to log in and browse all tenant workspaces
 
@@ -162,11 +162,11 @@
 
 **Independent Test**: Create a backup, make a change, restore from the backup, and verify the restored state matches
 
-- [ ] T043 [US9] Implement database backup creation and file storage in `backend/app/storage.py`
-- [ ] T044 [US9] Implement database restore from backup file in `backend/app/storage.py`
-- [ ] T045 [US9] Add backup/restore API endpoints for operators in `backend/app/operators.py`
-- [ ] T046 [P] [US9] Build the backup/restore UI with status feedback in `frontend/src/ui.js`, `frontend/src/api.js`, and `frontend/src/styles.css`
-- [ ] T047 [US9] Add backup/restore actions to the operator dashboard in `frontend/src/main.js`
+- [x] T043 [US9] Implement database backup creation and file storage in `backend/app/storage.py`
+- [x] T044 [US9] Implement database restore from backup file in `backend/app/storage.py`
+- [x] T045 [US9] Add backup/restore API endpoints for operators in `backend/app/operators.py`
+- [x] T046 [P] [US9] Build the backup/restore UI with status feedback in `frontend/src/ui.js`, `frontend/src/api.js`, and `frontend/src/styles.css`
+- [x] T047 [US9] Add backup/restore actions to the operator dashboard in `frontend/src/main.js`
 
 **Checkpoint**: Operators should be able to back up and restore the application database
 
@@ -176,9 +176,9 @@
 
 **Purpose**: Improvements that affect multiple user stories and production readiness
 
-- [ ] T048 [P] Update README and quickstart documentation for file-only data sources, embedded database, operator role, and backup/restore in `README.md` and `specs/001-data-analytics-platform/quickstart.md`
-- [ ] T049 Harden tenant-scoping edge cases, operator access boundaries, validation, and logging across `backend/app/auth.py`, `backend/app/tenants.py`, `backend/app/operators.py`, `backend/app/analytics.py`, and `backend/app/storage.py`
-- [ ] T050 Validate the full localhost workflow end to end in `specs/001-data-analytics-platform/quickstart.md`
+- [x] T048 [P] Update README and quickstart documentation for file-only data sources, embedded database, operator role, and backup/restore in `README.md` and `specs/001-data-analytics-platform/quickstart.md`
+- [x] T049 Harden tenant-scoping edge cases, operator access boundaries, validation, and logging across `backend/app/auth.py`, `backend/app/tenants.py`, `backend/app/operators.py`, `backend/app/analytics.py`, and `backend/app/storage.py`
+- [x] T050 Validate the full localhost workflow end to end in `specs/001-data-analytics-platform/quickstart.md`
 
 ---
 

@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+dist/
+*.egg-info/
+
+# Node
+node_modules/
+frontend/dist/
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# Database
+backend/data/*.db
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backup files (keep directory, ignore contents)
+backend/backups/*
+!backend/backups/.gitkeep
