@@ -2,7 +2,7 @@
 
 ## Overview
 
-The browser UI is a single-page experience built with Vite and vanilla HTML, CSS, and JavaScript. It should feel simple, fast, and consistent across tenant registration, tenant user management, authentication, data source management, request submission, and results review.
+The browser UI is a single-page experience built with Vite and vanilla HTML, CSS, and JavaScript. It should feel simple, fast, and consistent across tenant registration, tenant user management, authentication, file-based data source management, request submission, results review, and operator management with backup/restore.
 
 ## Primary Routes
 
@@ -34,9 +34,9 @@ The browser UI is a single-page experience built with Vite and vanilla HTML, CSS
 - Shows password policy guidance
 
 ### `/data-sources`
-- Lists configured SQL/NoSQL sources and uploaded files
-- Supports add, validate, disable, and delete actions
-- Shows status badges for each source
+- Lists uploaded file sources (text, PDF, Word, Excel)
+- Supports file upload, validate, disable, and delete actions
+- Shows status badges for each file source
 
 ### `/requests/new`
 - Request submission form
@@ -54,10 +54,33 @@ The browser UI is a single-page experience built with Vite and vanilla HTML, CSS
 - Shows summary text, key metrics, tables, charts, and download buttons
 - Allows export to CSV, PDF, or Excel
 
+### `/operator/login`
+- Operator sign-in form
+- Fields: email, password
+- Primary action: sign in as operator
+
+### `/operator/dashboard`
+- System-wide management dashboard
+- Shows all tenants, system health, and quick actions
+- Includes navigation to tenant browsing and backup/restore
+
+### `/operator/tenants`
+- Lists all tenants with status and key metadata
+- Supports selecting a tenant to view its details
+
+### `/operator/tenants/{id}`
+- View a specific tenant's users, data sources, and analytics requests
+- Read-only cross-tenant access for operator oversight
+
+### `/operator/backup`
+- Backup management screen
+- Shows backup history with timestamps and sizes
+- Actions: create new backup, download backup file, restore from backup
+
 ## UI States
 
 ### Loading States
-- Show clear loading indicators during tenant creation, login, password changes, data source validation, request submission, and result retrieval.
+- Show clear loading indicators during tenant creation, login, password changes, data source validation, request submission, result retrieval, backup creation, and restore operations.
 
 ### Empty States
 - Explain what the user should do next when no tenant users, data sources, or requests exist.
@@ -76,6 +99,7 @@ The browser UI is a single-page experience built with Vite and vanilla HTML, CSS
 - Result download buttons MUST be visible only when a result is available.
 - Status badges SHOULD use consistent labels across the app: `pending`, `validating`, `queued`, `running`, `succeeded`, `failed`, `canceled`.
 - Tenant management actions SHOULD only be visible to tenant admins.
+- Operator-specific screens and actions SHOULD only be visible to authenticated operators.
 - The UI SHOULD not require page reloads for normal status refreshes.
 
 ## Accessibility Requirements

@@ -161,11 +161,10 @@ Lists the authenticated tenant's data sources.
 Creates a data source or file upload record.
 
 **Request examples**
-- SQL/NoSQL source: connection details and source metadata
 - File source: upload file and label
 
 ### `POST /api/data-sources/validate`
-Validates a database connection or uploaded file source.
+Validates an uploaded file source.
 
 **Request**
 ```json
@@ -263,6 +262,89 @@ Downloads the result in the requested format.
   "request_id": "uuid",
   "format": "csv"
 }
+```
+
+## Operator
+
+### `POST /api/operator/login`
+Authenticates an operator.
+
+**Request**
+```json
+{
+  "email": "operator@example.com",
+  "password": "string"
+}
+```
+
+**Response**
+```json
+{
+  "operator": {
+    "id": "uuid",
+    "email": "operator@example.com"
+  },
+  "message": "logged_in"
+}
+```
+
+### `POST /api/operator/logout`
+Ends the current operator session.
+
+**Response**
+```json
+{ "message": "logged_out" }
+```
+
+### `GET /api/operator/tenants`
+Lists all tenants in the system.
+
+### `POST /api/operator/tenants/detail`
+Returns a specific tenant's details, users, and data sources.
+
+**Request**
+```json
+{
+  "tenant_id": "uuid"
+}
+```
+
+### `POST /api/operator/tenants/users`
+Lists users for a specified tenant.
+
+**Request**
+```json
+{
+  "tenant_id": "uuid"
+}
+```
+
+### `POST /api/operator/backup`
+Creates a database backup.
+
+**Response**
+```json
+{
+  "backup_id": "uuid",
+  "file_size": 12345,
+  "created_at": "2026-08-12T12:00:00Z",
+  "message": "backup_created"
+}
+```
+
+### `POST /api/operator/restore`
+Restores the database from a backup file.
+
+**Request**
+```json
+{
+  "backup_id": "uuid"
+}
+```
+
+**Response**
+```json
+{ "message": "restore_completed" }
 ```
 
 ## Health

@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Build a multi-tenant application that can run data analytic tasks. 1. Register tenant with tenant admin. 2. Tenant admin create tenant user and assign user role: admin, user. 3. Admin and user login, change password. Minimum password request: 8-12 chars include upcase, lowercase, number. 4. User send request from a browser UI. 5. Application run data analytic. Data sources: sql/nosql DB(confi-able). text file, pdf, word, excel. 6. Find good data analytic method. 7. Show result on UI and also can be downloaded."
+**Input**: User description: "Build a multi-tenant application that can run data analytic tasks. 1. Register tenant with tenant admin. 2. Tenant admin create tenant user and assign user role: admin, user. 3. Admin and user login, change password. Minimum password request: 8-12 chars include upcase, lowercase, number. 4. User send request from a browser UI. 5. Application run data analytic. Data sources: text file, pdf, word, excel. 6. Find good data analytic method. 7. Show result on UI and also can be downloaded. 8. Not using external database for application data storage. instead use embedded database or file system. 9. Add operator role to manage tenant and data backup and restore. 10. Operator can view all tenant data and manage them. 11. Operator backup and restore data application database."
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -71,25 +71,24 @@ A tenant user can send a data analytics request from a browser UI.
 **Acceptance Scenarios**:
 
 1. **Given** a signed-in tenant user, **When** the user submits an analytics request from the browser UI, **Then** the system records the request for that tenant
-2. **Given** an analytics request submission, **When** the system validates the input, **Then** the request is accepted only if it includes the required analysis details and allowed tenant data sources
+2. **Given** an analytics request submission, **When** the system validates the input, **Then** the request is accepted only if it includes the required analysis details and allowed tenant file sources
 3. **Given** an invalid request payload, **When** the user submits it, **Then** the system returns a clear validation message
 
 ---
 
-### User Story 5 - Data Source Processing (Priority: P1)
+### User Story 5 - File-Based Data Source Processing (Priority: P1)
 
-The application can run analytics against trusted SQL/NoSQL databases and uploaded text, PDF, Word, and Excel files.
+The application can run analytics against uploaded text, PDF, Word, and Excel files. Data sources are limited to file uploads only.
 
-**Why this priority**: Analytics depends on reliable access to tenant-approved data sources.
+**Why this priority**: Analytics depends on reliable access to tenant-uploaded file sources.
 
-**Independent Test**: Can be fully tested by connecting or uploading supported source types and confirming they are accepted for analytics processing.
+**Independent Test**: Can be fully tested by uploading supported file types and confirming they are accepted for analytics processing within the tenant workspace.
 
 **Acceptance Scenarios**:
 
-1. **Given** a tenant-approved SQL or NoSQL database connection, **When** the system accesses the source, **Then** the data is available for analytics processing
-2. **Given** a supported file upload such as text, PDF, Word, or Excel, **When** the file is submitted, **Then** the system accepts it for analysis
-3. **Given** an unsupported or corrupted file, **When** the user submits it, **Then** the system rejects it with a clear error
-4. **Given** a tenant user selects approved sources for a request, **When** the request runs, **Then** the system only uses sources available to that tenant
+1. **Given** a supported file upload such as text, PDF, Word, or Excel, **When** the file is submitted, **Then** the system accepts it for analysis
+2. **Given** an unsupported or corrupted file, **When** the user submits it, **Then** the system rejects it with a clear error
+3. **Given** a tenant user selects approved file sources for a request, **When** the request runs, **Then** the system only uses files available to that tenant
 
 ---
 
@@ -103,7 +102,7 @@ The application finds a good data analytics method for the submitted request bas
 
 **Acceptance Scenarios**:
 
-1. **Given** a structured database request, **When** the system evaluates the request, **Then** it selects an appropriate structured-data analytics method
+1. **Given** a spreadsheet-based request, **When** the system evaluates the request, **Then** it selects an appropriate tabular-data analytics method
 2. **Given** a document-based request, **When** the system evaluates the request, **Then** it selects an appropriate document-analysis method
 3. **Given** a request with ambiguous inputs, **When** the system evaluates the request, **Then** it chooses a safe fallback method and explains the choice
 
@@ -125,6 +124,38 @@ Users can see analytics results in the UI and download them for later use.
 
 ---
 
+### User Story 8 - Operator Login and Cross-Tenant Access (Priority: P1)
+
+An operator can log in with operator credentials, view all tenants and their data, and manage tenant configurations across the system.
+
+**Why this priority**: Operator access is required for system administration, tenant oversight, and data management across all tenants.
+
+**Independent Test**: Can be fully tested by logging in as an operator and verifying the operator can view and navigate all tenant workspaces.
+
+**Acceptance Scenarios**:
+
+1. **Given** an operator account exists in the system, **When** the operator logs in with valid credentials, **Then** the operator reaches a system-wide management dashboard
+2. **Given** a signed-in operator, **When** the operator views the tenant list, **Then** all registered tenants are displayed with their status
+3. **Given** a signed-in operator, **When** the operator selects a tenant, **Then** the operator can view that tenant's users, data sources, and analytics requests
+
+---
+
+### User Story 9 - Operator Backup and Restore (Priority: P2)
+
+The operator can back up the application database to a file and restore the database from a previously created backup file.
+
+**Why this priority**: Backup and restore are critical for data safety and disaster recovery, but can follow the core tenant workflow.
+
+**Independent Test**: Can be fully tested by creating a backup, making a change, restoring from the backup, and verifying the restored state matches the original.
+
+**Acceptance Scenarios**:
+
+1. **Given** a signed-in operator, **When** the operator triggers a database backup, **Then** the system creates a backup file and provides a download or storage confirmation
+2. **Given** a signed-in operator with a valid backup file, **When** the operator triggers a restore, **Then** the system restores the application database from the backup file
+3. **Given** a restore operation in progress, **When** the restore completes, **Then** the system confirms success and reports any issues encountered
+
+---
+
 ### Edge Cases
 
 - What happens when a tenant admin tries to create a user that already exists in the same tenant?
@@ -134,13 +165,15 @@ Users can see analytics results in the UI and download them for later use.
 - What occurs when analytics processing exceeds expected time limits?
 - How does the system handle concurrent analytics requests from the same tenant?
 - What happens when user authentication tokens expire during long-running analytics tasks?
+- What happens when an operator attempts to restore a corrupted or incompatible backup file?
+- How does the system handle concurrent backup and restore operations?
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
 - **FR-001**: System MUST allow a new tenant to be registered with an initial tenant admin account
-- **FR-002**: System MUST associate every user with exactly one tenant
+- **FR-002**: System MUST associate every tenant user with exactly one tenant
 - **FR-003**: System MUST allow tenant admins to create tenant users
 - **FR-004**: System MUST allow tenant admins to assign users the `admin` or `user` role within the tenant
 - **FR-005**: System MUST authenticate tenant admins and tenant users via secure session management
@@ -148,27 +181,31 @@ Users can see analytics results in the UI and download them for later use.
 - **FR-007**: System MUST enforce password rules requiring 8-12 characters with at least one uppercase letter, one lowercase letter, and one number
 - **FR-008**: System MUST reject password changes that violate the password policy
 - **FR-009**: System MUST allow tenant users to submit analytics requests from a browser UI
-- **FR-010**: System MUST allow analytics requests only for data sources approved for the same tenant
-- **FR-011**: System MUST support trusted SQL and NoSQL database connections for tenant analytics
-- **FR-012**: System MUST support file uploads for text, PDF, Word, and Excel formats
-- **FR-013**: System MUST validate file formats and reject unsupported or corrupted file types
-- **FR-014**: System MUST automatically select an appropriate analytics method based on data characteristics and user objectives
-- **FR-015**: System MUST display analytics results through an interactive web interface
-- **FR-016**: System MUST allow users to download analytics results in supported formats
-- **FR-017**: System MUST provide real-time status updates for analytics processing
-- **FR-018**: System MUST maintain tenant-scoped audit logs of user activities and analytics requests
-- **FR-019**: System MUST handle concurrent analytics requests with appropriate queuing
-- **FR-020**: System MUST provide confidence scores or method explanations for AI-selected analytics approaches
+- **FR-010**: System MUST allow analytics requests only for file sources approved for the same tenant
+- **FR-011**: System MUST support file uploads for text, PDF, Word, and Excel formats as the only analytics data sources
+- **FR-012**: System MUST validate file formats and reject unsupported or corrupted file types
+- **FR-013**: System MUST automatically select an appropriate analytics method based on data characteristics and user objectives
+- **FR-014**: System MUST display analytics results through an interactive web interface
+- **FR-015**: System MUST allow users to download analytics results in supported formats
+- **FR-016**: System MUST provide real-time status updates for analytics processing
+- **FR-017**: System MUST use an embedded database or file system for application data storage without requiring external database servers
+- **FR-018**: System MUST support an `operator` role that can view and manage all tenant data across the system
+- **FR-019**: System MUST allow the operator to view tenant lists, tenant users, data sources, and analytics requests across all tenants
+- **FR-020**: System MUST allow the operator to perform database backup to a file
+- **FR-021**: System MUST allow the operator to restore the application database from a backup file
+- **FR-022**: System MUST maintain audit logs of operator actions including backup and restore events
 
 ### Key Entities
 
-- **Tenant**: Represents an isolated customer workspace with its own users, roles, and analytics activity
-- **User**: Represents a tenant member with authentication credentials, role, and request history
+- **Tenant**: Represents an isolated customer workspace with its own users, roles, file sources, and analytics activity
+- **User**: Represents a tenant member with authentication credentials, role (`admin` or `user`), and request history
+- **Operator**: Represents a system-level operator account with cross-tenant visibility and backup/restore permissions
 - **TenantMembership**: Represents the association between a user and a tenant, including the assigned role
-- **DataSource**: Represents configured connections to SQL/NoSQL databases or uploaded files with metadata and connection status
+- **DataSource**: Represents uploaded file sources with metadata and processing status
 - **AnalyticsRequest**: Represents user-submitted analysis tasks with data source references, objectives, processing status, and results
 - **AnalyticsResult**: Represents the output of analytics processing including visualizations, statistics, and downloadable artifacts
-- **AuditLog**: Represents tenant-scoped system events and user actions for compliance and debugging purposes
+- **AuditLog**: Represents tenant-scoped and operator-scoped system events for compliance and debugging purposes
+- **BackupRecord**: Represents a database backup file with timestamp, size, and metadata
 
 ## Success Criteria *(mandatory)*
 
@@ -183,6 +220,9 @@ Users can see analytics results in the UI and download them for later use.
 - **SC-007**: 90% of users successfully complete end-to-end analytics workflow (request submission to result download) on first attempt
 - **SC-008**: Download generation completes within 10 seconds for standard result sets
 - **SC-009**: Method selection explanations are available for at least 95% of completed analytics requests
+- **SC-010**: An operator can view and navigate any tenant workspace within 5 seconds of selection
+- **SC-011**: A database backup operation completes within 30 seconds for typical application data sizes
+- **SC-012**: A database restore operation completes within 60 seconds and leaves the system in a consistent state
 
 ## Assumptions
 
@@ -190,10 +230,11 @@ Users can see analytics results in the UI and download them for later use.
 - Users have stable internet connectivity for cloud-based processing
 - Tenant admins are the first account created for each tenant
 - Tenant users are managed by tenant admins and do not self-register independently
-- Data sources (databases) are accessible from the application server environment
+- Data sources are limited to file uploads (text, PDF, Word, Excel) with no external database connections for analytics
+- Application data storage uses an embedded database (e.g., SQLite) or file system without requiring an external database server
 - File uploads are limited to 50MB per file for performance and storage considerations
 - User base is primarily technical users comfortable with data analysis concepts
 - AI model selection is optional; the platform uses a deterministic analytics router by default and can use any configured OpenAI-compatible provider for enhanced explanations
 - Analytics processing will be performed server-side rather than client-side
-- Database credentials will be stored using industry-standard encryption (AES-256)
-- The system will initially support a subset of SQL/NoSQL databases (PostgreSQL, MySQL, MongoDB) with extensibility for others
+- Operator accounts are created at system setup time and managed outside the tenant registration flow
+- Backup files are stored on the local file system or a configured storage location accessible to the operator

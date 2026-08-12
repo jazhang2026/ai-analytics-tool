@@ -41,20 +41,19 @@
 - Spark/Dask: powerful but too heavy for the expected MVP scale.
 - A single LLM-driven analysis path: flexible, but harder to make reliable and expensive to run.
 
-## 4) File and database source support
+## 4) File source support
 
-**Decision**: Support two source families:
-- Structured sources: SQL and NoSQL databases that the user configures explicitly.
+**Decision**: Support file-based data sources only:
 - File sources: text, PDF, Word, and Excel uploads.
 
 **Rationale**:
-- This matches the user story directly.
-- Explicit configuration avoids accidental access to untrusted or unknown sources.
+- This matches the user story directly and simplifies the data pipeline.
+- File-only sources reduce dependency on external database drivers and connection management.
 - File ingestion can be handled through a common normalization layer before analytics run.
 
 **Alternatives considered**:
-- Auto-discovery of files and databases: too ambiguous for a first version.
-- Supporting every database connector immediately: broad, but not necessary for the MVP.
+- SQL/NoSQL database sources: adds external dependency and configuration complexity not needed for the MVP.
+- Auto-discovery of files: too ambiguous for a first version.
 
 ## 5) Hosting and deployment target
 
@@ -86,34 +85,36 @@
 
 ## 7) Authentication strategy
 
-**Decision**: Use tenant-scoped password-based authentication with hashed passwords, session or token-based login suitable for browser clients, and role-based access for tenant admins and tenant users.
+**Decision**: Use tenant-scoped password-based authentication with hashed passwords, session or token-based login suitable for browser clients, and role-based access for tenant admins and tenant users. Add a separate operator authentication path for system-level cross-tenant access and backup/restore permissions.
 
 **Rationale**:
 - The project needs tenant registration, role assignment, login, and password changes for a browser UI.
+- The operator role requires system-level authentication that is separate from tenant membership.
 - The approach is familiar, testable, and compatible with Render/Railway-style hosting.
 - Tenant-scoped authentication keeps users isolated to their own workspace and supports the admin/user model.
-- The password policy is explicit and can be enforced consistently at the application layer.
+- The password policy is explicit and can be enforced consistently at the application layer for all account types.
 
 **Alternatives considered**:
 - OAuth/SSO: useful later, but not required for the first release.
 - Magic-link auth: convenient, but adds email delivery dependency.
 - Passwordless login only: simpler for users, but does not fit the requested admin-managed tenant workflow.
+- Merging operator into tenant admin role: would break tenant isolation and backup/restore boundaries.
 
 ## 8) Storage approach
 
-**Decision**: Use PostgreSQL for users, requests, metadata, and audit logs in both production and local development; store uploaded files in a filesystem or object-storage layer.
+**Decision**: Use an embedded database (SQLite) for users, requests, metadata, and audit logs in both production and local development; store uploaded files and backup files in the filesystem.
 
 **Rationale**:
-- PostgreSQL is a good fit for authentication, request state, and auditability.
-- Using the same database engine locally and in production reduces environment drift.
-- Uploaded files are better stored separately from metadata.
-- This structure makes downloads, retries, and result traceability easier.
-- Local development is simpler when backend state, file storage, and secrets are explicit and reproducible in the IDE.
+- SQLite eliminates the need for an external database server and simplifies deployment.
+- Using the same embedded engine locally and in production eliminates environment drift.
+- Uploaded files and backup files are stored separately from the application database.
+- This structure makes downloads, retries, backup, restore, and result traceability easier.
+- Local development is simpler when backend state, file storage, and backups are self-contained.
 
 **Alternatives considered**:
+- PostgreSQL: powerful and mature, but requires an external server which contradicts the embedded-database requirement.
 - Storing everything in files: simple, but difficult to query and audit.
 - NoSQL-only persistence: possible, but less natural for auth and request lifecycle tracking.
-- SQLite for local development: lightweight, but diverges from production behavior.
 
 ## 9) Local development and shared model access
 
@@ -130,3 +131,18 @@
 - Tool-specific configuration per IDE: increases drift and makes debugging harder.
 - Hardcoding model/provider settings into code: brittle and unsafe for credentials.
 - Requiring an LLM for all runs: makes local debugging and deployment unnecessarily fragile.
+
+## 10) Backup and restore strategy
+
+**Decision**: Use file-based backup for the embedded database, triggered by the operator through API endpoints, with backup files stored on the filesystem.
+
+**Rationale**:
+- An embedded database like SQLite supports simple file-copy backup that is reliable and fast.
+- File-based backup avoids external tool dependencies and keeps the deployment self-contained.
+- Operator-triggered backup and restore via the UI gives system administrators control without direct filesystem access.
+- Backup files stored in a dedicated directory make restore operations straightforward.
+
+**Alternatives considered**:
+- External backup tools or services: adds deployment complexity and contradicts the embedded-database goal.
+- Automated scheduled backups: useful later, but not required for the MVP.
+- Streaming replication: overkill for an embedded database and the expected scale.
