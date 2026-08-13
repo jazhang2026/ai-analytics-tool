@@ -38,3 +38,24 @@ cd frontend
 npm install
 
 npm run dev
+
+
+# More feature changes
+
+## /speckit.specify 
+Feature changes and bug fixes for `001-data-analytics-platform`:
+1. Seeddata for operator account: username = operator@aiatool.com, password = Operator123.
+2. UI changes: the header show "AI Analytics Tool" on the left side. Login or logged in user email on the right side. Click on the email will show a dropdown menu with "Change Password" and "Logout" options.
+3. UI changes: when not logged in, show login page with email and password fields. After login, show the navigation bar. Change "Don't have an account? Register" to "Register a new tenant account."
+4. UI changes: After login, under the header, show a navigation bar with "Dashboard", "Data Sources", "Data Analytics", "Users".
+5. UI changes: Add "New Request" button on Data Analytics page. On top of the data analytics list. Add "New Request" button on Dashboard page. On top right of the Recent Requests list.
+
+## /speckit.plan 
+The application uses Vite with minimal number of libraries. Use vanilla HTML, CSS, and JavaScript as much as possible for UI. Backend is python. The selectedUI and backend libraries should be suppored with popular WEB hosting plan (support js and python).
+
+## /speckit.tasks 
+
+## /speckit.implement
+
+Seed operator account:
+cd backend && python tests/seed_operator.py

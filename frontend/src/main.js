@@ -7,29 +7,63 @@ let currentUser = null;
 export function getCurrentUser() { return currentUser; }
 export function setCurrentUser(u) { currentUser = u; }
 
-export function navBar() {
+export function headerBar() {
+  const token = getToken();
+  const email = currentUser?.email || '';
+  const role = currentUser?.role || '';
+  const userMenu = token
+    ? `<div class="user-menu">
+        <button class="user-email-btn" onclick="window._toggleMenu(event)">${email} <span class="caret">&#9662;</span></button>
+        <div class="user-dropdown" id="user-dropdown" hidden>
+          <a href="/account/password" onclick="window._closeMenu()">Change Password</a>
+          <a href="#" onclick="event.preventDefault(); window._logout()">Logout</a>
+        </div>
+      </div>`
+    : '';
+  return `
+    <header class="app-header">
+      <div class="brand">AI Analytics Tool</div>
+      ${userMenu}
+    </header>
+    ${token ? navBar(role) : ''}
+  `;
+}
+
+export function navBar(role) {
   const token = getToken();
   if (!token) return '';
-  if (currentUser?.role === 'operator') {
-    return `<nav>
+  if (role === 'operator') {
+    return `<nav class="app-nav">
       <a href="/operator/dashboard">Dashboard</a>
       <a href="/operator/tenants">Tenants</a>
       <a href="/operator/backup">Backup</a>
-      <span class="spacer"></span>
-      <span>${currentUser.email}</span>
-      <button onclick="window._logout()">Logout</button>
     </nav>`;
   }
-  return `<nav>
+  return `<nav class="app-nav">
     <a href="/dashboard">Dashboard</a>
     <a href="/data-sources">Data Sources</a>
-    <a href="/requests/new">New Request</a>
-    ${currentUser?.role === 'admin' ? '<a href="/tenant/users">Users</a>' : ''}
-    <a href="/account/password">Password</a>
-    <span class="spacer"></span>
-    <span>${currentUser.email}</span>
-    <button onclick="window._logout()">Logout</button>
+    <a href="/analytics">Data Analytics</a>
+    ${role === 'admin' ? '<a href="/tenant/users">Users</a>' : ''}
   </nav>`;
+}
+
+window._toggleMenu = (e) => {
+  e.stopPropagation();
+  const dd = document.getElementById('user-dropdown');
+  if (dd) dd.hidden = !dd.hidden;
+};
+
+window._closeMenu = () => {
+  const dd = document.getElementById('user-dropdown');
+  if (dd) dd.hidden = true;
+};
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.user-menu')) window._closeMenu();
+});
+
+export function isOperatorPath(path) {
+  return path === '/operator/login' || path.startsWith('/operator/');
 }
 
 window._logout = async () => {
@@ -39,6 +73,11 @@ window._logout = async () => {
   navigate('/login');
 };
 
+function renderHeader() {
+  const el = document.getElementById('app-header');
+  if (el) el.innerHTML = headerBar();
+}
+
 async function refreshPage() {
   const path = window.location.pathname;
   if (getToken() && !currentUser) {
@@ -47,21 +86,17 @@ async function refreshPage() {
       setCurrentUser(me);
     } catch {
       clearToken();
-      navigate('/login');
+      navigate(isOperatorPath(path) ? '/operator/login' : '/login');
       return;
     }
   }
-  const nav = navBar();
-  const app = document.getElementById('app');
-  registerRoutes(path);
-  if (nav) {
-    setTimeout(() => {
-      const el = document.getElementById('app');
-      if (el && !el.querySelector('nav')) {
-        el.insertAdjacentHTML('afterbegin', nav);
-      }
-    }, 0);
+  // Unauthenticated visitor on an operator page → operator login
+  if (!getToken() && isOperatorPath(path) && path !== '/operator/login') {
+    navigate('/operator/login');
+    return;
   }
+  renderHeader();
+  registerRoutes(path);
 }
 
 window.addEventListener('popstate', refreshPage);

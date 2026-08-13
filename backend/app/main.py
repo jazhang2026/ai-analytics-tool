@@ -50,16 +50,19 @@ def health():
 # ---------------------------------------------------------------------------
 # Route registration
 # ---------------------------------------------------------------------------
-from . import analytics, operators, tenants  # noqa: E402
+from . import analytics, data_sources, operators, tenants  # noqa: E402
 from .auth import (  # noqa: E402
+    bearer_scheme,
     create_token,
     current_user,
+    decode_token,
     hash_password,
     pwd_context,
     validate_password_policy,
     verify_password,
 )
-from .models import User  # noqa: E402
+from fastapi.security import HTTPAuthorizationCredentials  # noqa: E402
+from .models import Operator, User  # noqa: E402
 from .storage import get_db  # noqa: E402
 from pydantic import BaseModel, EmailStr  # noqa: E402
 from fastapi import Depends, HTTPException, status  # noqa: E402
@@ -67,6 +70,7 @@ from sqlalchemy.orm import Session  # noqa: E402
 
 app.include_router(tenants.router, prefix="/api")
 app.include_router(analytics.router, prefix="/api")
+app.include_router(data_sources.router, prefix="/api")
 app.include_router(operators.router, prefix="/api")
 
 
@@ -105,8 +109,28 @@ def logout():
 
 
 @app.get("/api/me")
-def me(user: User = Depends(current_user), db: Session = Depends(get_db)):
+def me(
+    creds: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    db: Session = Depends(get_db),
+):
     from .models import TenantMembership
+    if creds is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+    payload = decode_token(creds.credentials)
+    if payload.get("type") == "operator":
+        op = db.query(Operator).filter(Operator.id == payload["sub"]).first()
+        if not op or not op.is_active:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Operator not found or inactive")
+        return {
+            "id": op.id,
+            "email": op.email,
+            "role": "operator",
+            "tenant_id": None,
+            "is_active": op.is_active,
+        }
+    user = db.query(User).filter(User.id == payload["sub"]).first()
+    if not user or not user.is_active:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found or inactive")
     membership = db.query(TenantMembership).filter(
         TenantMembership.tenant_id == user.tenant_id,
         TenantMembership.user_id == user.id,
@@ -121,12 +145,34 @@ def me(user: User = Depends(current_user), db: Session = Depends(get_db)):
 
 
 @app.patch("/api/me/password")
-def change_password(body: PasswordChangeRequest, user: User = Depends(current_user), db: Session = Depends(get_db)):
+def change_password(
+    body: PasswordChangeRequest,
+    creds: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    db: Session = Depends(get_db),
+):
+    from datetime import datetime, timezone
+    if creds is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+    payload = decode_token(creds.credentials)
+
+    if payload.get("type") == "operator":
+        op = db.query(Operator).filter(Operator.id == payload["sub"]).first()
+        if not op or not op.is_active:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Operator not found or inactive")
+        if not verify_password(body.current_password, op.password_hash):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Current password is incorrect")
+        validate_password_policy(body.new_password)
+        op.password_hash = hash_password(body.new_password)
+        db.commit()
+        return {"message": "password_updated"}
+
+    user = db.query(User).filter(User.id == payload["sub"]).first()
+    if not user or not user.is_active:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found or inactive")
     if not verify_password(body.current_password, user.password_hash):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Current password is incorrect")
     validate_password_policy(body.new_password)
     user.password_hash = hash_password(body.new_password)
-    from datetime import datetime, timezone
     user.password_changed_at = datetime.now(timezone.utc)
     db.commit()
     return {"message": "password_updated"}

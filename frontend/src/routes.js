@@ -1,13 +1,19 @@
-import { render, navigate, showLoading } from './ui.js';
+import { render, navigate, showLoading, initPasswordToggles } from './ui.js';
 import { api, setToken, clearToken, getToken } from './api.js';
 
 const routes = {};
 export function register(path, handler) { routes[path] = handler; }
 
 export function registerRoutes(currentPath) {
-  const handler = routes[currentPath];
-  if (handler) { handler(); }
-  else { render('<div class="error"><h2>404</h2><p>Page not found</p></div>'); }
+  // Exact match first
+  if (routes[currentPath]) { routes[currentPath](); return; }
+  // Parameterized match (e.g. /requests/:id)
+  for (const [pattern, handler] of Object.entries(routes)) {
+    if (!pattern.includes(':')) continue;
+    const regex = new RegExp('^' + pattern.replace(/:[^/]+/g, '[^/]+') + '$');
+    if (regex.test(currentPath)) { handler(); return; }
+  }
+  render('<div class="error"><h2>404</h2><p>Page not found</p></div>');
 }
 
 // ---- Root redirect ----
@@ -32,6 +38,7 @@ register('/register', () => {
     </form>
     <p>Already have an account? <a href="/login">Login</a></p>
   `);
+  initPasswordToggles();
   document.getElementById('f').addEventListener('submit', async (e) => {
     e.preventDefault(); const fd = new FormData(e.target);
     try { showLoading(); const d = await api.post('/tenants', { tenant_name: fd.get('tenant_name'), admin_email: fd.get('admin_email'), admin_password: fd.get('admin_password') }); setToken(d.token); navigate('/dashboard'); }
@@ -48,8 +55,9 @@ register('/login', () => {
       <label>Password</label><input name="password" type="password" required />
       <button type="submit">Login</button>
     </form>
-    <p>Don't have an account? <a href="/register">Register</a></p>
+    <p>Don't have an account? <a href="/register">Register a new tenant account.</a></p>
   `);
+  initPasswordToggles();
   document.getElementById('f').addEventListener('submit', async (e) => {
     e.preventDefault(); const fd = new FormData(e.target);
     try { showLoading(); const d = await api.post('/auth/login', { email: fd.get('email'), password: fd.get('password') }); setToken(d.token); navigate('/dashboard'); }
@@ -65,7 +73,31 @@ register('/dashboard', async () => {
     const reqs = await api.get('/analytics-requests');
     import('./main.js').then(m => m.setCurrentUser(me));
     const rows = reqs.map(r => `<tr><td><a href="/requests/${r.id}">${r.title}</a></td><td><span class="badge badge-${r.status === 'succeeded' ? 'active' : r.status === 'failed' ? 'error' : 'pending'}">${r.status}</span></td><td>${r.selected_method || '-'}</td></tr>`).join('');
-    render(`<h1>Dashboard</h1><div class="card"><p>Welcome, ${me.email} (${me.role})</p></div><h2>Recent Requests</h2><table><thead><tr><th>Title</th><th>Status</th><th>Method</th></tr></thead><tbody>${rows || '<tr><td colspan="3">No requests yet</td></tr>'}</tbody></table>`);
+    render(`
+      <h1>Dashboard</h1>
+      <div class="card"><p>Welcome, ${me.email} (${me.role})</p></div>
+      <div class="section-header">
+        <h2>Recent Requests</h2>
+        <button onclick="window.location.href='/requests/new'">New Request</button>
+      </div>
+      <table><thead><tr><th>Title</th><th>Status</th><th>Method</th></tr></thead><tbody>${rows || '<tr><td colspan="3">No requests yet</td></tr>'}</tbody></table>
+    `);
+  } catch { clearToken(); navigate('/login'); }
+});
+
+// ---- Data Analytics (request list) ----
+register('/analytics', async () => {
+  if (!getToken()) { navigate('/login'); return; }
+  try {
+    const reqs = await api.get('/analytics-requests');
+    const rows = reqs.map(r => `<tr><td><a href="/requests/${r.id}">${r.title}</a></td><td><span class="badge badge-${r.status === 'succeeded' ? 'active' : r.status === 'failed' ? 'error' : 'pending'}">${r.status}</span></td><td>${r.selected_method || '-'}</td><td>${r.requested_at ? new Date(r.requested_at).toLocaleString() : '-'}</td></tr>`).join('');
+    render(`
+      <div class="section-header">
+        <h1>Data Analytics</h1>
+        <button onclick="window.location.href='/requests/new'">New Request</button>
+      </div>
+      <table><thead><tr><th>Title</th><th>Status</th><th>Method</th><th>Requested</th></tr></thead><tbody>${rows || '<tr><td colspan="4">No analytics requests yet</td></tr>'}</tbody></table>
+    `);
   } catch { clearToken(); navigate('/login'); }
 });
 
@@ -80,8 +112,8 @@ register('/tenant/users', async () => {
     render(`
       <h1>Tenant Users</h1>
       <div class="card">
-        <h2>Add User</h2>
-        <form id="add-user">
+        <button type="button" class="secondary" id="toggle-add-user" onclick="window._toggleAddUser()">+ Add User</button>
+        <form id="add-user" style="display:none; margin-top:0.75rem">
           <label>Email</label><input name="email" type="email" required />
           <label>Password</label><input name="password" type="password" required minlength="8" maxlength="12" />
           <label>Role</label><select name="role"><option value="user">User</option><option value="admin">Admin</option></select>
@@ -90,6 +122,18 @@ register('/tenant/users', async () => {
       </div>
       <table><thead><tr><th>Email</th><th>Role</th></tr></thead><tbody>${rows}</tbody></table>
     `);
+    window._toggleAddUser = () => {
+      const form = document.getElementById('add-user');
+      const btn = document.getElementById('toggle-add-user');
+      if (form.style.display === 'none') {
+        form.style.display = 'block';
+        btn.textContent = '− Hide Add User';
+      } else {
+        form.style.display = 'none';
+        btn.textContent = '+ Add User';
+      }
+    };
+    initPasswordToggles();
     document.getElementById('add-user').addEventListener('submit', async (e) => {
       e.preventDefault(); const fd = new FormData(e.target);
       try { await api.post('/tenant/users', { email: fd.get('email'), password: fd.get('password'), role: fd.get('role') }); navigate('/tenant/users'); }
@@ -99,8 +143,13 @@ register('/tenant/users', async () => {
 });
 
 // ---- Password Change ----
-register('/account/password', () => {
+register('/account/password', async () => {
   if (!getToken()) { navigate('/login'); return; }
+  let role = 'user';
+  try {
+    const me = await api.get('/me');
+    role = me.role;
+  } catch { clearToken(); navigate('/login'); return; }
   render(`
     <h1>Change Password</h1>
     <form id="f">
@@ -110,9 +159,14 @@ register('/account/password', () => {
       <button type="submit">Change Password</button>
     </form>
   `);
+  initPasswordToggles();
   document.getElementById('f').addEventListener('submit', async (e) => {
     e.preventDefault(); const fd = new FormData(e.target);
-    try { await api.patch('/me/password', { current_password: fd.get('current_password'), new_password: fd.get('new_password') }); alert('Password changed'); navigate('/dashboard'); }
+    try {
+      await api.patch('/me/password', { current_password: fd.get('current_password'), new_password: fd.get('new_password') });
+      alert('Password changed');
+      navigate(role === 'operator' ? '/operator/dashboard' : '/dashboard');
+    }
     catch (err) { alert(err.message); }
   });
 });
@@ -122,7 +176,7 @@ register('/data-sources', async () => {
   if (!getToken()) { navigate('/login'); return; }
   try {
     const sources = await api.get('/data-sources');
-    const rows = sources.map(s => `<tr><td>${s.name}</td><td>${s.source_type}</td><td><span class="badge badge-${s.status === 'active' ? 'active' : 'pending'}">${s.status}</span></td></tr>`).join('');
+    const rows = sources.map(s => `<tr><td>${s.name}</td><td>${s.source_type}</td><td><span class="badge badge-${s.status === 'active' ? 'active' : 'pending'}">${s.status}</span></td><td><button class="danger" onclick="window._deleteSource('${s.id}')">Delete</button></td></tr>`).join('');
     render(`
       <h1>Data Sources</h1>
       <div class="card">
@@ -132,10 +186,38 @@ register('/data-sources', async () => {
           <button type="submit">Upload</button>
         </form>
       </div>
-      <table><thead><tr><th>Name</th><th>Type</th><th>Status</th></tr></thead><tbody>${rows || '<tr><td colspan="3">No data sources</td></tr>'}</tbody></table>
+      <table><thead><tr><th>Name</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rows || '<tr><td colspan="4">No data sources</td></tr>'}</tbody></table>
     `);
+    document.getElementById('upload-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const file = e.target.file.files[0];
+      if (!file) return;
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('name', file.name);
+      try {
+        const res = await fetch('/api/data-sources', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${getToken()}` },
+          body: fd,
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.detail || err.error?.message || res.statusText);
+        }
+        navigate('/data-sources');
+      } catch (err) { alert(err.message); }
+    });
   } catch { clearToken(); navigate('/login'); }
 });
+
+window._deleteSource = async (id) => {
+  if (!confirm('Delete this data source?')) return;
+  try {
+    await api.post('/data-sources/delete', { data_source_id: id });
+    navigate('/data-sources');
+  } catch (err) { alert(err.message); }
+};
 
 // ---- New Request ----
 register('/requests/new', async () => {
@@ -225,6 +307,7 @@ register('/operator/login', () => {
       <button type="submit">Login</button>
     </form>
   `);
+  initPasswordToggles();
   document.getElementById('f').addEventListener('submit', async (e) => {
     e.preventDefault(); const fd = new FormData(e.target);
     try { showLoading(); const d = await api.post('/operator/login', { email: fd.get('email'), password: fd.get('password') }); setToken(d.token); import('./main.js').then(m => { m.setCurrentUser({ role: 'operator', email: fd.get('email') }); navigate('/operator/dashboard'); }); }

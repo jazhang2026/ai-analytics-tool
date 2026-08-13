@@ -25,3 +25,87 @@ th { background: #f8fafc; font-weight: 600; }
 .loading, .error { text-align: center; padding: 2rem; }
 .error { color: #dc2626; }
 .card { background: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1rem; }
+.pw-wrapper { display: flex; align-items: center; margin-bottom: 0.75rem; }
+.pw-wrapper input { margin-bottom: 0; flex: 1; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.pw-toggle { padding: 0.5rem 0.75rem; border-top-left-radius: 0; border-bottom-left-radius: 0; font-size: 0.8rem; white-space: nowrap; }
+
+/* Header */
+#app-header { max-width: 960px; margin: 0 auto; padding: 1rem 1rem 0; }
+.app-header {
+  background: #1e293b;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 0;
+}
+.app-header .brand { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.5px; }
+
+/* User dropdown */
+.user-menu { position: relative; }
+.user-email-btn {
+  background: transparent;
+  border: 1px solid #475569;
+  color: #fff;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.user-email-btn:hover { background: #334155; }
+.caret { font-size: 0.7rem; margin-left: 0.25rem; }
+.user-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 0.25rem;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  min-width: 180px;
+  z-index: 100;
+  padding: 0.25rem 0;
+}
+.user-dropdown a {
+  display: block;
+  padding: 0.6rem 1rem;
+  color: #334155;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.user-dropdown a:hover { background: #f1f5f9; }
+
+/* Navigation bar */
+.app-nav {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-top: none;
+  padding: 0.6rem 1.25rem;
+  border-radius: 0 0 8px 8px;
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.app-nav a {
+  color: #334155;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+}
+.app-nav a:hover { color: #2563eb; border-bottom-color: #2563eb; }
+
+/* Section header with action button */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+.section-header h2 { margin-bottom: 0; }
