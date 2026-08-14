@@ -1,10 +1,10 @@
 <!--
 Sync Impact Report:
-Version change: [INITIAL] → 1.0.0
-Modified principles: N/A (initial creation)
-Added sections: Core Principles (5 principles), Development Standards, Governance
-Removed sections: N/A
-Templates requiring updates: ✅ plan-template.md (reviewed - constitution check section compatible), ✅ spec-template.md (reviewed - requirements structure compatible), ✅ tasks-template.md (reviewed - task categorization compatible)
+Version change: 1.0.0 → 1.1.0
+Modified principles: II (TDD → Simplicity First), V (AI Reliability → Security & Data Integrity)
+Added sections: None
+Removed sections: Outdated technology stack entries (LangChain, ChromaDB, FAISS, NumPy, mypy)
+Templates requiring updates: ✅ plan-template.md, ✅ spec-template.md, ✅ tasks-template.md (compatible)
 Follow-up TODOs: None
 -->
 
@@ -12,53 +12,58 @@ Follow-up TODOs: None
 
 ## Core Principles
 
-### I. Code Quality Excellence
-All code MUST follow established style guides (PEP 8 for Python), be self-documenting with clear variable/function names, and include comprehensive docstrings. Code reviews are mandatory for all changes. Complex logic MUST be simplified or thoroughly documented. No code duplication is allowed without explicit justification.
+### I. Code Quality
+All code MUST be clear, self-documenting, and consistent. Python code follows PEP 8. JavaScript code uses consistent ES module patterns. Functions and classes MUST have descriptive names. Duplication MUST be avoided — shared logic belongs in reusable modules. Complex logic MUST be simplified or documented.
 
-### II. Test-First Development (NON-NEGOTIABLE)
-TDD is mandatory: tests MUST be written before implementation. Unit tests MUST cover all critical paths with minimum 80% code coverage. Integration tests MUST validate all component interactions. Red-Green-Refactor cycle is strictly enforced. No feature implementation without corresponding failing tests.
+### II. Simplicity First
+Prefer the simplest solution that meets the requirement. Vanilla HTML, CSS, and JavaScript are preferred over frameworks for the frontend. New dependencies MUST be justified — each added library increases maintenance burden and attack surface. The embedded database (SQLite) eliminates external infrastructure dependencies. YAGNI: do not build features before they are needed.
 
 ### III. User Experience Consistency
-All user interfaces MUST follow consistent design patterns. Terminology MUST be uniform across the application. Error messages MUST be actionable and user-friendly. Response times MUST be under 2 seconds for standard operations. All features MUST be accessible and inclusive by design.
+All pages MUST share a consistent header, navigation, and visual style. Terminology MUST be uniform across the application. Error messages MUST be actionable and human-readable. Forms MUST provide clear validation feedback. Response times SHOULD be under 2 seconds for standard operations.
 
-### IV. Performance & Scalability
-All document processing operations MUST complete within 30 seconds for standard files (up to 10MB). Memory usage MUST remain under 2GB for typical workloads. The system MUST support concurrent processing of at least 10 documents. Database queries MUST be optimized and indexed appropriately. Performance testing is required for all new features.
+### IV. Performance
+File uploads MUST be validated within 5 seconds for files up to 10MB. Database queries MUST use appropriate indexes for common access patterns. Page navigation MUST feel responsive — under 1 second for standard transitions. Analytics requests MUST be acknowledged within 2 seconds of submission.
 
-### V. AI Reliability & Transparency
-All AI-generated content MUST include confidence scores or source references. System MUST gracefully handle AI model failures with fallback mechanisms. User prompts and AI responses MUST be logged for audit purposes. AI model decisions MUST be explainable when requested. Regular evaluation of AI output quality is mandatory.
+### V. Security & Data Integrity
+All credentials MUST be stored as hashed values — never in plaintext. API keys and secrets MUST be read from environment variables, never hardcoded. User data is tenant-scoped: one tenant MUST never access another tenant's data. Operator credentials and seed scripts MUST be excluded from deployment artifacts. Input validation is mandatory on all user-supplied data.
+
+## Technology Stack
+
+- **Backend**: Python 3.11+, FastAPI, Uvicorn, SQLAlchemy
+- **Frontend**: Vite, vanilla HTML/CSS/JavaScript (ES modules)
+- **Database**: SQLite (embedded, no external server required)
+- **Data Processing**: Pandas, python-docx, pypdf, openpyxl
+- **Auth**: passlib (bcrypt), python-jose (JWT)
+- **Testing**: pytest (where applicable)
+- **Code Quality**: pylint, black
 
 ## Development Standards
 
-### Technology Stack
-- Primary Language: Python 3.11+
-- AI Framework: LangChain for agentic workflows
-- Data Processing: Pandas, NumPy
-- Document Processing: PyPDF, python-docx
-- Vector Storage: ChromaDB or FAISS
-- Testing: pytest, pytest-cov
-- Code Quality: pylint, black, mypy
+### File Organization
+- `backend/app/` — FastAPI application modules
+- `backend/tests/` — test scripts and seed data (excluded from deployment)
+- `frontend/src/` — Vite source files
+- `specs/` — Spec-Driven Development feature specifications
 
-### Security Requirements
+### Security
 - All API keys and credentials MUST be stored in environment variables
-- User data MUST be encrypted at rest
+- Passwords MUST be hashed with bcrypt before storage
+- User data MUST be tenant-scoped at the application layer
 - Input validation is mandatory for all user inputs
-- Regular security audits are required
 - No hardcoded secrets in code
 
-### Documentation Standards
-- All functions MUST have docstrings
-- Architecture decisions MUST be documented in ADR format
+### Documentation
+- Backend functions SHOULD have docstrings
+- Architecture decisions MUST be documented in the specs directory
 - User-facing documentation MUST be kept in sync with features
-- API documentation MUST be auto-generated from code
+- README.md MUST contain up-to-date setup and run instructions
 
 ## Governance
 
 This constitution supersedes all other development practices. Amendments require:
 - Documentation of the proposed change
-- Team approval and discussion
-- Migration plan for existing code
-- Version increment following semantic versioning
+- Version increment following semantic versioning (MAJOR for principle removals, MINOR for additions/refinements, PATCH for wording fixes)
 
-All pull requests MUST verify compliance with constitution principles. Complexity beyond standard patterns MUST be explicitly justified. Use this constitution as the primary reference for all development decisions.
+When a principle cannot be satisfied, the exception MUST be documented with justification.
 
-**Version**: 1.0.0 | **Ratified**: 2026-08-06 | **Last Amended**: 2026-08-06
+**Version**: 1.1.0 | **Ratified**: 2026-08-06 | **Last Amended**: 2026-08-14

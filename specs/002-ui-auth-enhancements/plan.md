@@ -51,22 +51,27 @@ frontend/src/styles.css     # Header, nav, dropdown styles
 backend/tests/seed_operator.py    # NEW: standalone CLI seed script (in tests/ — excluded from production)
 ```
 
+### Files changed (backend)
+
+```text
+backend/app/main.py         # /api/me and /api/me/password extended for operator support
+```
+
 ### Files unchanged
 
 ```text
-backend/app/*.py            # No backend API changes needed
-frontend/src/api.js         # No API changes
+frontend/src/api.js         # No API client changes
 frontend/src/ui.js          # No UI helper changes
 ```
 
 ## Implementation Approach
 
 ### US1: Operator Seed Script
-- New file: `backend/seed_operator.py`
+- New file: `backend/tests/seed_operator.py`
 - Standalone Python script that imports from `app.models` and `app.auth`
 - Creates operator if not exists; idempotent
-- Added to `.gitignore` exclusion list (or documented as run-separately)
-- Run via: `python seed_operator.py`
+- Located in `tests/` directory — naturally excluded from production deployment
+- Run via: `python tests/seed_operator.py`
 
 ### US2: Header with Brand and User Menu
 - Modify `main.js` navBar() to output header with brand + email dropdown

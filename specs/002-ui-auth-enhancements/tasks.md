@@ -68,6 +68,7 @@
 
 - [x] T009 [US5] Add "New Request" button to Dashboard route in `frontend/src/routes.js`
 - [x] T010 [US5] Add "New Request" button to Data Analytics route in `frontend/src/routes.js`
+- [x] T011 [US5] Create `/analytics` page route with request list and New Request button in `frontend/src/routes.js`
 
 **Checkpoint**: Quick-action buttons present and functional on both pages
 
@@ -79,7 +80,7 @@
 - **T003–T005 (US2)**: Independent — header is self-contained
 - **T006 (US3)**: Independent — single text change
 - **T007–T008 (US4)**: Depends on T003 (header styles) for visual consistency
-- **T009–T010 (US5)**: Independent — route-level additions
+- **T009–T011 (US5)**: Independent — route-level additions
 
 All user stories can proceed in parallel after any shared CSS foundation.
 
