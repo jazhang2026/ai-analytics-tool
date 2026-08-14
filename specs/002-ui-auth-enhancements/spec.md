@@ -105,7 +105,7 @@ A "New Request" button appears on the Dashboard page (top right of Recent Reques
 - **FR-001**: A standalone CLI seed script MUST create a default operator account with email operator@aiatool.com and password Operator123 when executed
 - **FR-002**: The seed script MUST NOT create a duplicate operator account if one already exists; it MUST report that the operator already exists
 - **FR-003**: The seed script MUST be placed in the `tests/` directory so it is excluded from production deployment artifacts
-- **FR-004**: Application header MUST display "AI Analytics Tool" on the left side on all pages when logged in
+- **FR-004**: Application header MUST display "AI Analytics Tool" on the left side on all pages (brand only when unauthenticated; brand + user menu when logged in)
 - **FR-005**: Application header MUST display the logged-in user's email on the right side
 - **FR-006**: Clicking the user's email in the header MUST open a dropdown menu with "Change Password" and "Logout" options
 - **FR-007**: The "Change Password" option MUST navigate to the password change page
