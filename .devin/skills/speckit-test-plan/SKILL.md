@@ -100,7 +100,7 @@ Create a `test-plan.md` for the active feature covering **unit tests** and **int
    - SCs that require buildable verification (response times, gating behavior) get integration test cases
    - Edge cases from spec.md become negative test cases (invalid input, duplicates, forbidden access)
 
-5. **Write the test plan** to `<feature_directory>/test-plan.md`. Do not write test code — this is the planning artifact. `/speckit-test` consumes it to write the actual tests.
+5. **Write the test plan** to `<feature_directory>/test-plan.md`. Do not write test code — this is the planning artifact. `/speckit-test-run` consumes it to write the actual tests.
 
 ## Rules
 
@@ -124,4 +124,4 @@ Output:
 - Total unit test cases planned
 - Total integration test cases planned
 - Requirements coverage (FRs with ≥1 test case / total FRs)
-- Next step: `/speckit-test` to implement and run the tests
+- Next step: `/speckit-test-run` to implement and run the tests
